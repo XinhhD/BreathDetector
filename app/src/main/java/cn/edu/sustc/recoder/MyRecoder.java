@@ -8,10 +8,14 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
@@ -25,7 +29,7 @@ public class MyRecoder {
     private int recordBufSize = 0;
     private int SamplingRate = 48000;
     private int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
-    private Writer outFile;
+    private DataOutputStream outFile;
     public boolean isRecording;
 
     public MyRecoder() {
@@ -49,27 +53,21 @@ public class MyRecoder {
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SamplingRate, channelConfiguration, EncodingBitRate, recordBufSize);
     }
 
-    public void setWritter(Writer outFile) {
+    public void setWritter(DataOutputStream outFile) {
         this.outFile = outFile;
     }
 
     public void record(){
-        CsvWriter csvWriter = new CsvWriter();
-        try (CsvAppender csvAppender = csvWriter.append(outFile)) {
-            // header
-            audioRecord.startRecording();
+        try  {
             isRecording = true;
-            short[] f = new short[recordBufSize];
-            short lf = f[0];
+            short[] buffer = new short[recordBufSize];
+            audioRecord.startRecording();
             while (isRecording) {
-                audioRecord.read(f, 0, recordBufSize, AudioRecord.READ_NON_BLOCKING);
-                try {
-                    csvAppender.appendLine(Long.toString(System.currentTimeMillis()), Short.toString(f[0]));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                int bufferReadResult = audioRecord.read(buffer, 0, recordBufSize);
+                for (int i = 0; i < bufferReadResult; i++) {
+                    outFile.writeShort(buffer[i]);
                 }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,29 +86,7 @@ public class MyRecoder {
         audioRecord.release();
     }
 
-    public void playSound() {
-        int bufferSize = AudioTrack.getMinBufferSize(SamplingRate,channelConfiguration, EncodingBitRate);
-        AudioTrack player = new AudioTrack.Builder()
-                .setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .build())
-                .setAudioFormat(new AudioFormat.Builder()
-                        .setEncoding(EncodingBitRate)
-                        .setSampleRate(SamplingRate)
-                        .setChannelMask(channelConfiguration)
-                        .build())
-                .setBufferSizeInBytes(bufferSize)
-                .build();
-        player.play();
-        new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-
-            }
-        }).start();
-
-    }
 
 
 }

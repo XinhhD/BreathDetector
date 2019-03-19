@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     Uri selectedFile;
     TextView chooseFile;
     Button writeButton;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     EditText name;
     private String musicPath = "/Lemon.mp3";
     MediaPlayer mMediaPlayer = new MediaPlayer();
+    MyRecoder mc = new MyRecoder();
     private boolean isPlaying = false;
 
     @Override
@@ -70,53 +73,43 @@ public class MainActivity extends AppCompatActivity {
         if(!isPlaying) {
             playMusic();
             record();
-            writeButton.setText("Recording");
+            writeButton.setText("STOP");
             isPlaying = true;
         }else {
             pauseMusic();
-            writeButton.setText("Record");
+            record();
+            writeButton.setText("SYNC");
             isPlaying = false;
         }
 
     }
     public void record(){
-        MyRecoder mc = new MyRecoder();
         if (mc.isRecording) {
             mc.stopRecording();
             Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_LONG).show();
         } else {
-            String storageState = Environment.getExternalStorageState();
             String filename = name.getText().toString()+".pcm";
-            if (storageState.equals(Environment.MEDIA_MOUNTED)) { //路径： /storage/emulated/0/Android/data/com.yoryky.demo/cache/yoryky.txt
-                filename = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator +Environment.DIRECTORY_MUSIC+File.separator+ filename;
-                DataOutputStream writer = null;
-                try {
-                    OutputStream os = new FileOutputStream(filename);
-                    BufferedOutputStream bos = new BufferedOutputStream(os);
-                    writer = new DataOutputStream(bos);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                }
-                mc.setWritter(writer);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mc.record();
-                    }
-                }).start();
-                Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_LONG).show();
+            final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_MUSIC + File.separator + filename);
+            if (!file.mkdirs()) {
+                Log.e(TAG, "Directory not created");
             }
+            if (file.exists()) {
+                file.delete();
+            }
+            mc.setOutFile(file);
+            mc.record();
+            Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_LONG).show();
         }
     }
 
     public void playMusic(){
         mMediaPlayer.start();
-        Toast.makeText(MainActivity.this,"开始放音乐了",Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this,"开始放音乐了",Toast.LENGTH_SHORT).show();
     }
 
     public void pauseMusic(){
         mMediaPlayer.pause();
-        Toast.makeText(MainActivity.this,"暂时停止了",Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this,"暂时停止了",Toast.LENGTH_SHORT).show();
     }
 
     public void initMusicFile(){

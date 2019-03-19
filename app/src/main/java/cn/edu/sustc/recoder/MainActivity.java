@@ -64,6 +64,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void chooseFile(){
+        if(isPlaying) {
+            Toast.makeText(MainActivity.this,"请先停止播放",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (mc.isRecording) {
+            record();
+        }
         Intent i2 = new Intent(MainActivity.this, FileChooser.class);
         i2.putExtra(Constants.SELECTION_MODE,Constants.SELECTION_MODES.SINGLE_SELECTION.ordinal());
         startActivityForResult(i2,1);
@@ -86,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     public void record(){
         if (mc.isRecording) {
             mc.stopRecording();
-            Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_SHORT).show();
         } else {
             String filename = name.getText().toString()+".pcm";
             final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_MUSIC + File.separator + filename);
@@ -98,26 +105,26 @@ public class MainActivity extends AppCompatActivity {
             }
             mc.setOutFile(file);
             mc.record();
-            Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_SHORT).show();
         }
     }
 
     public void playMusic(){
         mMediaPlayer.start();
-        Toast.makeText(MainActivity.this,"开始放音乐了",Toast.LENGTH_SHORT).show();
     }
 
     public void pauseMusic(){
         mMediaPlayer.pause();
-        Toast.makeText(MainActivity.this,"暂时停止了",Toast.LENGTH_SHORT).show();
     }
 
     public void initMusicFile(){
         try {
-            //设置音频文件到MediaPlayer对象中
-            AssetFileDescriptor fileDescriptor = getAssets().openFd("music/Lemon.mp3");
-            mMediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(),fileDescriptor.getStartOffset(), fileDescriptor.getLength());
-            //让MediaPlayer对象准备
+            if (selectedFile == null) {
+                AssetFileDescriptor fileDescriptor = getAssets().openFd("music/Lemon.mp3");
+                mMediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getLength());
+            } else {
+                mMediaPlayer.setDataSource(selectedFile.getPath());
+            }
             mMediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,5 +139,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         chooseFile.setText(selectedFile.toString());
+        mMediaPlayer.reset();
+        initMusicFile();
     }
 }

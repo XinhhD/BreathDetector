@@ -102,7 +102,6 @@ public class MyRecoder {
     public void stopRecording() {
         isRecording = false;
         audioRecord.stop();
-        audioRecord.release();
     }
 
 

@@ -1,4 +1,4 @@
-package cn.edu.sustc.recoder;
+package cn.edu.sustc.recoder.Activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -19,17 +19,14 @@ import android.widget.Toast;
 import com.aditya.filebrowser.Constants;
 import com.aditya.filebrowser.FileChooser;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import cn.edu.sustc.recoder.Utils.MyRecoder;
+import cn.edu.sustc.recoder.R;
+import cn.edu.sustc.recoder.Utils.Util;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";

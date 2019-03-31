@@ -1,4 +1,4 @@
-package cn.edu.sustc.recoder;
+package cn.edu.sustc.recoder.Activity;
 import android.media.AudioFormat;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
+
+import cn.edu.sustc.recoder.R;
 import omrecorder.AudioChunk;
 import omrecorder.AudioRecordConfig;
 import omrecorder.OmRecorder;

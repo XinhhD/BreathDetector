@@ -1,4 +1,4 @@
-package cn.edu.sustc.recoder;
+package cn.edu.sustc.recoder.Utils;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;

@@ -12,10 +12,13 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
@@ -29,7 +32,7 @@ public class MyRecoder {
     private int recordBufSize = 0;
     private int SamplingRate = 48000;
     private int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
-    private DataOutputStream outFile;
+    private File outFile;
     public boolean isRecording;
 
     public MyRecoder() {
@@ -53,40 +56,53 @@ public class MyRecoder {
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SamplingRate, channelConfiguration, EncodingBitRate, recordBufSize);
     }
 
-    public void setWritter(DataOutputStream outFile) {
+    public void setOutFile(File outFile) {
         this.outFile = outFile;
     }
 
-    public void record(){
-        try  {
-            isRecording = true;
-            short[] buffer = new short[recordBufSize];
-            audioRecord.startRecording();
-            while (isRecording) {
-                int bufferReadResult = audioRecord.read(buffer, 0, recordBufSize);
-                for (int i = 0; i < bufferReadResult; i++) {
-                    outFile.writeShort(buffer[i]);
+
+    public void record() {
+        final byte data[] = new byte[recordBufSize];
+        audioRecord.startRecording();
+        isRecording = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                FileOutputStream os = null;
+                try {
+                    os = new FileOutputStream(outFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                if (null != os) {
+                    while (isRecording) {
+                        int read = audioRecord.read(data, 0, recordBufSize);
+                        // 如果读取音频数据没有出现错误，就将数据写入到文件
+                        if (AudioRecord.ERROR_INVALID_OPERATION != read) {
+                            try {
+                                os.write(data);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    try {
+                        Log.i(TAG, "run: close file output stream !");
+                        os.flush();
+                        os.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     public void stopRecording() {
         isRecording = false;
-        try {
-            outFile.flush();
-            outFile.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         audioRecord.stop();
-        audioRecord.release();
     }
-
-
 
 
 }

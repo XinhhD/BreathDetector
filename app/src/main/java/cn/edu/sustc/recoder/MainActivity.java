@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     Uri selectedFile;
     TextView chooseFile;
     Button writeButton;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     EditText name;
     private String musicPath = "/Lemon.mp3";
     MediaPlayer mMediaPlayer = new MediaPlayer();
+    MyRecoder mc = new MyRecoder();
     private boolean isPlaying = false;
 
     @Override
@@ -61,6 +64,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void chooseFile(){
+        if(isPlaying) {
+            Toast.makeText(MainActivity.this,"请先停止播放",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (mc.isRecording) {
+            record();
+        }
         Intent i2 = new Intent(MainActivity.this, FileChooser.class);
         i2.putExtra(Constants.SELECTION_MODE,Constants.SELECTION_MODES.SINGLE_SELECTION.ordinal());
         startActivityForResult(i2,1);
@@ -68,63 +78,53 @@ public class MainActivity extends AppCompatActivity {
 
     public void onRecord(View view){
         if(!isPlaying) {
-            playMusic();
             record();
-            writeButton.setText("Recording");
+            playMusic();
+            writeButton.setText("STOP");
             isPlaying = true;
         }else {
+            record();
             pauseMusic();
-            writeButton.setText("Record");
+            writeButton.setText("SYNC");
             isPlaying = false;
         }
 
     }
     public void record(){
-        MyRecoder mc = new MyRecoder();
         if (mc.isRecording) {
             mc.stopRecording();
-            Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_SHORT).show();
         } else {
-            String storageState = Environment.getExternalStorageState();
             String filename = name.getText().toString()+".pcm";
-            if (storageState.equals(Environment.MEDIA_MOUNTED)) { //路径： /storage/emulated/0/Android/data/com.yoryky.demo/cache/yoryky.txt
-                filename = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator +Environment.DIRECTORY_MUSIC+File.separator+ filename;
-                DataOutputStream writer = null;
-                try {
-                    OutputStream os = new FileOutputStream(filename);
-                    BufferedOutputStream bos = new BufferedOutputStream(os);
-                    writer = new DataOutputStream(bos);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                }
-                mc.setWritter(writer);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mc.record();
-                    }
-                }).start();
-                Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_LONG).show();
+            final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_MUSIC + File.separator + filename);
+            if (!file.mkdirs()) {
+                Log.e(TAG, "Directory not created");
             }
+            if (file.exists()) {
+                file.delete();
+            }
+            mc.setOutFile(file);
+            mc.record();
+            Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_SHORT).show();
         }
     }
 
     public void playMusic(){
         mMediaPlayer.start();
-        Toast.makeText(MainActivity.this,"开始放音乐了",Toast.LENGTH_LONG).show();
     }
 
     public void pauseMusic(){
         mMediaPlayer.pause();
-        Toast.makeText(MainActivity.this,"暂时停止了",Toast.LENGTH_LONG).show();
     }
 
     public void initMusicFile(){
         try {
-            //设置音频文件到MediaPlayer对象中
-            AssetFileDescriptor fileDescriptor = getAssets().openFd("music/Lemon.mp3");
-            mMediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(),fileDescriptor.getStartOffset(), fileDescriptor.getLength());
-            //让MediaPlayer对象准备
+            if (selectedFile == null) {
+                AssetFileDescriptor fileDescriptor = getAssets().openFd("music/Lemon.mp3");
+                mMediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getLength());
+            } else {
+                mMediaPlayer.setDataSource(selectedFile.getPath());
+            }
             mMediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -139,5 +139,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         chooseFile.setText(selectedFile.toString());
+        mMediaPlayer.reset();
+        initMusicFile();
     }
 }

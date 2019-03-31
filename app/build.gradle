@@ -28,7 +28,6 @@ dependencies {
     implementation 'com.kailashdabhi:om-recorder:1.1.5'
     implementation 'de.siegmar:fastcsv:1.0.3'
     implementation 'com.adityak:browsemyfiles:1.7'
-    implementation fileTree(dir:'lib',includes:['*jar'])
     // https://mvnrepository.com/artifact/com.github.wendykierp/JTransforms
     implementation group: 'com.github.wendykierp', name: 'JTransforms', version: '3.1'
     testImplementation 'junit:junit:4.12'

@@ -78,13 +78,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void onRecord(View view){
         if(!isPlaying) {
-            playMusic();
             record();
+            playMusic();
             writeButton.setText("STOP");
             isPlaying = true;
         }else {
-            pauseMusic();
             record();
+            pauseMusic();
             writeButton.setText("SYNC");
             isPlaying = false;
         }

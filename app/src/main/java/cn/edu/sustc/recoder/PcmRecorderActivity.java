@@ -22,10 +22,7 @@ import omrecorder.PullableSource;
 import omrecorder.Recorder;
 import omrecorder.WriteAction;
 
-/**
- * @author Kailash Dabhi
- * @date 26-07-2016. Copyright (c) 2017 Kingbull Technology. All rights reserved.
- */
+
 public class PcmRecorderActivity extends AppCompatActivity {
     Recorder recorder;
     ImageView recordButton;

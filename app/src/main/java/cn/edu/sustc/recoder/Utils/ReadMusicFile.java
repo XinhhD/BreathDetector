@@ -25,8 +25,5 @@ public class ReadMusicFile {
         return buffer;
     }
 
-    public static void main(String[] args) {
-        ReadMusicFile rm = new ReadMusicFile("music/Lemon.mp3");
-        System.out.println(rm.read());
-    }
+
 }

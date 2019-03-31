@@ -3,6 +3,7 @@ package cn.edu.sustc.recoder.Activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
@@ -18,15 +19,23 @@ import android.widget.Toast;
 
 import com.aditya.filebrowser.Constants;
 import com.aditya.filebrowser.FileChooser;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import cn.edu.sustc.recoder.Utils.MyRecoder;
 import cn.edu.sustc.recoder.R;
 import cn.edu.sustc.recoder.Utils.Util;
+import cn.edu.sustc.recoder.Utils.XYData;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -39,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer mMediaPlayer = new MediaPlayer();
     MyRecoder mc = new MyRecoder();
     private boolean isPlaying = false;
+    private LineChart chart;
+    // graph data
+    LineDataSet dataSet;
+    private float graphIndexNow=0;
+    private float interval = 0.001f; // 坐标间隔
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +65,12 @@ public class MainActivity extends AppCompatActivity {
         chooseButton= (Button)findViewById(R.id.choose);
         name = (EditText)findViewById(R.id.file);
         chooseFile = (TextView)findViewById(R.id.filename) ;
+        chart = (LineChart) findViewById(R.id.chart);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("于dd日HH_mm_ss创建");// HH:mm:ss
         Date date = new Date(System.currentTimeMillis());
         name.setText(simpleDateFormat.format(date));
         initMusicFile();
+        setData(makeRandomData());
     }
 
     public void onChooseFile(View view){
@@ -139,4 +156,36 @@ public class MainActivity extends AppCompatActivity {
         mMediaPlayer.reset();
         initMusicFile();
     }
+
+    public XYData[] makeRandomData(){
+        XYData[] data = new XYData[100];
+        for (int i=0; i<100; i++){
+            data[i] = new XYData((float)i, (float) Math.random());
+        }
+        return data;
+    }
+
+    public void setData(XYData xydata[]){
+        List<Entry> entries = new ArrayList<Entry>();
+        for (XYData data : xydata){
+            entries.add(new Entry(data.getX(), data.getY()));
+        }
+        dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
+        dataSet.setColor(Color.BLACK);
+        dataSet.setValueTextColor(Color.RED); // styling, ...
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        chart.invalidate(); // refresh1111111111111111111111111111161
+    }
+
+    public void updateData(float y){
+        Entry newData = new Entry(graphIndexNow, y);
+        graphIndexNow += interval;
+        if (graphIndexNow > 10000){  // 超出坐标设成0
+            graphIndexNow = 0;
+        }
+//        dataSet.removeEntry();
+        dataSet.addEntry(newData);
+    }
+
 }

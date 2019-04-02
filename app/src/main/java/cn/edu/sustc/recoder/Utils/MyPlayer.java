@@ -20,8 +20,9 @@ public class MyPlayer {
     private File inFile;
     public boolean isPlayering;
 
-    public MyPlayer() {
+    public MyPlayer(File file) {
         createAudioPlayer();
+        this.inFile = file;
     }
 
     public void setEncodingBitRate(int encodingBitRate) {

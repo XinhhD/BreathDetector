@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class MyRecoder {
     private static final String TAG = "MyRecoder";
@@ -19,6 +21,7 @@ public class MyRecoder {
     private int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
     private File outFile;
     public boolean isRecording;
+    private Queue<short[]> bufferQueue = new LinkedList<short[]>();
 
     public MyRecoder() {
         createAudioRecord();
@@ -35,6 +38,15 @@ public class MyRecoder {
     public void setChannelConfiguration(int channelConfiguration) {
         this.channelConfiguration = channelConfiguration;
     }
+
+    public short[] getUnCheckBuffer(){
+        if (bufferQueue.size()>0) {
+            return bufferQueue.poll();
+        }
+        return null;
+    }
+
+
 
     public void createAudioRecord() {
         recordBufSize = AudioRecord.getMinBufferSize(SamplingRate, channelConfiguration, EncodingBitRate);
@@ -65,7 +77,7 @@ public class MyRecoder {
                         int read = audioRecord.read(data, 0, recordBufSize);
                         // 如果读取音频数据没有出现错误，就将数据写入到文件
                         if (AudioRecord.ERROR_INVALID_OPERATION != read) {
-
+                            bufferQueue.offer(data.clone());  // 拷贝一个对象给队列
                         }
                     }
                     try {

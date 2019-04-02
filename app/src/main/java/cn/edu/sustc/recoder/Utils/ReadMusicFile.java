@@ -25,8 +25,18 @@ public class ReadMusicFile {
         return buffer;
     }
 
-    public static void main(String[] args) {
-        ReadMusicFile rm = new ReadMusicFile("music/Lemon.mp3");
-        System.out.println(rm.read());
+    public static byte[] read(String path){
+        byte[] buf = null;
+        File file = new File(path);
+        try {
+            InputStream fis = new FileInputStream(file);
+            buf = new byte[(int)file.length()];
+            fis.read(buf, 0, buf.length);
+            fis.close();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return buf;
     }
+
 }

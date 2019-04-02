@@ -12,19 +12,7 @@ public class ReadMusicFile {
         musicUrl = path;
     }
 
-    public byte[] read(){
-        File file = new File(musicUrl);
-        try {
-            InputStream fis = new FileInputStream(file);
-            buffer = new byte[(int)file.length()];
-            fis.read(buffer, 0, buffer.length);
-            fis.close();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-        return buffer;
-    }
-
+    
     public static byte[] read(String path){
         byte[] buf = null;
         File file = new File(path);
@@ -38,5 +26,6 @@ public class ReadMusicFile {
         }
         return buf;
     }
+
 
 }

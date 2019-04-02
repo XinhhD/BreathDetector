@@ -47,7 +47,7 @@ public class MyRecoder {
 
 
     public void record() {
-        final byte data[] = new byte[recordBufSize];
+        final short data[] = new short[recordBufSize];
         audioRecord.startRecording();
         isRecording = true;
         new Thread(new Runnable() {
@@ -65,11 +65,7 @@ public class MyRecoder {
                         int read = audioRecord.read(data, 0, recordBufSize);
                         // 如果读取音频数据没有出现错误，就将数据写入到文件
                         if (AudioRecord.ERROR_INVALID_OPERATION != read) {
-                            try {
-                                os.write(data);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+
                         }
                     }
                     try {

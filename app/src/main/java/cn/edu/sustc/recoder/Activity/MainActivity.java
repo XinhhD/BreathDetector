@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         Date date = new Date(System.currentTimeMillis());
         name.setText(simpleDateFormat.format(date));
         initMusicFile();
+
     }
 
     public void onChooseFile(View view){

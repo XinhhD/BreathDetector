@@ -26,6 +26,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.edu.sustc.recoder.Utils.MyPlayer;
 import cn.edu.sustc.recoder.Utils.MyRecoder;
 import cn.edu.sustc.recoder.R;
 import cn.edu.sustc.recoder.Utils.Util;
@@ -43,9 +45,10 @@ public class MainActivity extends AppCompatActivity {
     Uri selectedFile;
     Button startButton;
     Button chooseButton;
-    EditText name;
-    private String musicPath = "/Lemon.mp3";
+    String gengrateFileName;
+    private String musicPath = "music/Lemon.mp3";
     MediaPlayer mMediaPlayer = new MediaPlayer();
+    MyPlayer myPlayer = new MyPlayer();  // 这里要初始化
     MyRecoder mc = new MyRecoder();
     private boolean isPlaying = false;
     private LineChart chart;
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         startButton = (Button)findViewById(R.id.start);
         chooseButton = (Button)findViewById(R.id.choose);
-        name = (EditText)findViewById(R.id.file);
         {
             // 图表设置
             chart = (LineChart) findViewById(R.id.chart);
@@ -75,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
             Entry e = new Entry(0, 1);
             entries.add(e);
             dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
-//            dataSet
             dataSet.setColor(Color.BLACK);
             dataSet.setValueTextColor(Color.RED); // styling, ...
             LineData lineData = new LineData(dataSet);
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("于dd日HH_mm_ss创建");// HH:mm:ss
         Date date = new Date(System.currentTimeMillis());
-        name.setText(simpleDateFormat.format(date));
+        gengrateFileName = simpleDateFormat.format(date);
         initMusicFile();
         startTimer(); // 定时更新图标
     }
@@ -105,12 +106,13 @@ public class MainActivity extends AppCompatActivity {
     public void onRecord(View view){
         if(!isPlaying) {
             record();
-            playMusic();
+            //mMediaPlayer.start();
+            myPlayer.startPlayering();
             startButton.setText("STOP");
             isPlaying = true;
         }else {
             record();
-            pauseMusic();
+            myPlayer.stopPlayering();
             startButton.setText("START");
             isPlaying = false;
         }
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_SHORT).show();
         } else {
 
-            String filename = name.getText().toString()+".pcm";
+            String filename = gengrateFileName+".pcm";
             final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_MUSIC + File.separator + filename);
             if (!file.mkdirs()) {
                 Log.e(TAG, "Directory not created");
@@ -137,24 +139,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void playMusic(){
-        mMediaPlayer.start();
-    }
-
-    public void pauseMusic(){
-        mMediaPlayer.pause();
-    }
-
     public void initMusicFile(){
         try {
             if (selectedFile == null) {
                 AssetFileDescriptor fileDescriptor = getAssets().openFd("music/Lemon.mp3");
-                mMediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getLength());
+                myPlayer.setInFile(fileDescriptor.createInputStream());
+                //mMediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getLength());
             } else {
-                mMediaPlayer.setDataSource(selectedFile.getPath());
+                myPlayer.setInFile(new FileInputStream(selectedFile.getPath()));
+                //mMediaPlayer.setDataSource(sel0122ectedFile.getPath());
             }
             mMediaPlayer.prepare();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -166,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 selectedFile = data.getData();
             }
         }
-        mMediaPlayer.reset();
+        //mMediaPlayer.reset();
         initMusicFile();
     }
 
@@ -181,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             updateData((float)Math.random());
-            System.out.println("Update"+graphIndexNow);
         }
     }
 

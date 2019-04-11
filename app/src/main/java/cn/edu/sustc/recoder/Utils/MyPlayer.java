@@ -9,6 +9,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MyPlayer {
     private static final String TAG = "MyRecoder";
@@ -16,11 +17,17 @@ public class MyPlayer {
     private AudioTrack audioTrack;
     private int PlayerBufSize = 0;
     private int SamplingRate = 48000;
-    private int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
-    private File inFile;
+    private int channelConfiguration = AudioFormat.CHANNEL_OUT_MONO;
+    private FileInputStream inFile;
     public boolean isPlayering;
+    private ArrayList<Short> playData = new ArrayList<>();
 
-    public MyPlayer() {
+    public MyPlayer(FileInputStream file) {
+        createAudioPlayer();
+        this.inFile = file;
+    }
+
+    public MyPlayer(){
         createAudioPlayer();
     }
 
@@ -34,6 +41,12 @@ public class MyPlayer {
 
     public void setChannelConfiguration(int channelConfiguration) {
         this.channelConfiguration = channelConfiguration;
+    }
+    public Short getPlayData(int index){
+        if (playData.size()>0) {
+            return playData.get(index);
+        }
+        return null;
     }
 
     public void createAudioPlayer() {
@@ -52,7 +65,7 @@ public class MyPlayer {
                 AudioManager.AUDIO_SESSION_ID_GENERATE);
     }
 
-    public void setInFile(File inFile) {
+    public void setInFile(FileInputStream inFile) {
         this.inFile = inFile;
     }
 
@@ -65,7 +78,7 @@ public class MyPlayer {
             @Override
             public void run() {
                 try {
-                    DataInputStream fileInputStream = new DataInputStream(new FileInputStream(inFile));
+                    DataInputStream fileInputStream = new DataInputStream(inFile);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -87,7 +100,7 @@ public class MyPlayer {
                         }
                     }).start();
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

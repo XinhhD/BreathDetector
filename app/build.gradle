@@ -34,9 +34,10 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     // https://mvnrepository.com/artifact/com.github.wendykierp/JTransforms
     implementation group: 'com.github.wendykierp', name: 'JTransforms', version: '3.1'
-    testImplementation'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile 'mbanje.kurt:fabbutton:1.2.4@aar'
+    implementation 'mbanje.kurt:fabbutton:1.2.4@aar'
+    implementation 'com.ramotion.foldingcell:folding-cell:1.2.3'
 
 }

@@ -2,4 +2,8 @@
     <string name="app_name">Recoder</string>
     <string name="pause_recording">Pause Recording</string>
     <string name="resume_recording">Resume Recording</string>
+
+    <string name="title_activity_data">DataActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

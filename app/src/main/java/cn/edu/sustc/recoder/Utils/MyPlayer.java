@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Vector;
 
 public class MyPlayer {
     private static final String TAG = "MyRecoder";
@@ -20,7 +22,7 @@ public class MyPlayer {
     private int channelConfiguration = AudioFormat.CHANNEL_OUT_MONO;
     private FileInputStream inFile;
     public boolean isPlayering;
-    private ArrayList<Short> playData = new ArrayList<>();
+    private Vector<Byte> playData = new Vector<>();
 
     public MyPlayer(FileInputStream file) {
         createAudioPlayer();
@@ -42,7 +44,7 @@ public class MyPlayer {
     public void setChannelConfiguration(int channelConfiguration) {
         this.channelConfiguration = channelConfiguration;
     }
-    public Short getPlayData(int index){
+    public Byte getPlayData(int index){
         if (playData.size()>0) {
             return playData.get(index);
         }
@@ -92,6 +94,10 @@ public class MyPlayer {
                                     }
                                     if (readCount != 0 && readCount != -1) {
                                         audioTrack.write(tempBuffer, 0, readCount);
+                                        for (byte e:tempBuffer
+                                             ) {
+                                            playData.add(e);
+                                        }
                                     }
                                 }
                             } catch (IOException e) {

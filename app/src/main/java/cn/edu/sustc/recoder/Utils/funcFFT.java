@@ -8,7 +8,7 @@ public class funcFFT {
         // base case
         if (N == 1) return new Complex[] { x[0] };
         // radix 2 Cooley-Tukey FFT
-        if (N % 2 != 0) { throw new RuntimeException("N is not a power of 2:"+N); }
+        if (N % 2 != 0) { throw new RuntimeException("N is not maxValue power of 2:"+N); }
 
         // fft of even terms
         Complex[] even = new Complex[N/2];

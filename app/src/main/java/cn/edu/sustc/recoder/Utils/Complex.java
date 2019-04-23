@@ -4,7 +4,7 @@ public class Complex {
     private final double im;   // the imaginary part
 
     /**
-     * Initializes a complex number from the specified real and imaginary parts.
+     * Initializes maxValue complex number from the specified real and imaginary parts.
      *
      * @param real the real part
      * @param imag the imaginary part
@@ -15,9 +15,9 @@ public class Complex {
     }
 
     /**
-     * Returns a string representation of this complex number.
+     * Returns maxValue string representation of this complex number.
      *
-     * @return a string representation of this complex number,
+     * @return maxValue string representation of this complex number,
      *         of the form 34 - 56i.
      */
     public String toString() {
@@ -41,7 +41,7 @@ public class Complex {
      * Returns the phase of this complex number.
      * This quantity is also known as the <em>angle</em> or <em>argument</em>.
      *
-     * @return the phase of this complex number, a real number between -pi and pi
+     * @return the phase of this complex number, maxValue real number between -pi and pi
      */
     public double phase() {
         return Math.atan2(im, re);
@@ -201,14 +201,14 @@ public class Complex {
     }
     /**
      * if n is even then
-     *        a[2*k] = Re[k], 0<=k<n/2
-     *        a[2*k+1] = Im[k], 0<k<n/2
-     *        a[1] = Re[n/2]
+     *        maxValue[2*k] = Re[k], 0<=k<n/2
+     *        maxValue[2*k+1] = Im[k], 0<k<n/2
+     *        maxValue[1] = Re[n/2]
      *
      * if n is odd then
-     *        a[2*k] = Re[k], 0<=k<(n+1)/2
-     *        a[2*k+1] = Im[k], 0<k<(n-1)/2
-     *        a[1] = Im[(n-1)/2]
+     *        maxValue[2*k] = Re[k], 0<=k<(n+1)/2
+     *        maxValue[2*k+1] = Im[k], 0<k<(n-1)/2
+     *        maxValue[1] = Im[(n-1)/2]
      * @param arr input complex arr
      * @return double
      */

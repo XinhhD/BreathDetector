@@ -5,10 +5,18 @@ import org.jtransforms.fft.DoubleFFT_1D;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Vector;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import cn.edu.sustc.recoder.Utils.Complex;
 import cn.edu.sustc.recoder.Utils.FFT;
 import cn.edu.sustc.recoder.Utils.ReadMusicFile;
 import cn.edu.sustc.recoder.Utils.funcFFT;
+import cn.edu.sustc.recoder.Utils.loopQueue;
+import cn.edu.sustc.recoder.Utils.xcorr;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -86,5 +94,56 @@ public class XcorrTest {
         System.out.println();
     }
 
+    @Test
+    public void listTest() {
+        short st= 1;
+        double db = (double)st;
+        short[] s11 = {-1, 1, -1, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8};
+        byte[] s22 = {1, 2, 3, 4, 5, 6, 7, 8};
+        LinkedList s = new LinkedList();
+        s.add(s11);
+        LinkedList s1 = new LinkedList();
+        s1.add(s22);
+        xcorr.xcorr(s,s1);
+    }
+
+    @Test
+    public void ListConcurrent() {
+        final loopQueue<Short> s = new loopQueue<Short>(200);
+        Lock curl = new ReentrantLock();
+        try {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int j =0;
+                    for (int i = 0; i <10000000 ; i++) {
+                        short sh = 2;
+                        try {
+                            s.add(sh);
+                        } catch (ArrayStoreException e) {
+
+                        }
+
+                    }
+                }
+            }).start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int j = 0;
+                    for (int i = 0; i <10000000 ; i++) {
+                        try {
+                            s.removeOne();
+                        } catch (IllegalAccessException e) {
+                            System.out.println("remove wrong:"+j++);
+                        }
+                    }
+                }
+            }).start();
+        } catch (Exception e) {
+            e.getCause().printStackTrace();
+        }
+        System.out.println(s.count);
+    }
 }
 

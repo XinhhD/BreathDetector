@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Vector;
 
 public class MyRecoder {
     private static final String TAG = "MyRecoder";
@@ -22,7 +23,7 @@ public class MyRecoder {
     private int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
     private File outFile;
     public boolean isRecording;
-    private ArrayList<Short> dataArray = new ArrayList<>();
+    private Vector<Short> dataArray = new Vector<>();
 
     public MyRecoder() {
         createAudioRecord();
@@ -46,7 +47,6 @@ public class MyRecoder {
         }
         return null;
     }
-
 
 
     public void createAudioRecord() {

@@ -87,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
         Date date = new Date(System.currentTimeMillis());
         gengrateFileName = simpleDateFormat.format(date);
         initMusicFile();
-        startTimer(); // 定时更新图标
+        MyPlayer s = new MyPlayer();
+//        startTimer(); // 定时更新图标
     }
 
     public void onChooseFile(View view){

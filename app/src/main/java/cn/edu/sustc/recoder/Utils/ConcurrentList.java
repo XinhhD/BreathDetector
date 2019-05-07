@@ -44,7 +44,7 @@ public interface ConcurrentList {
      * @param end
      * @return
      */
-    public double getAll(int start, int end);
+    public double[] getAll(int start, int end);
 
     /**
      * total number in this list

@@ -1,7 +1,6 @@
 package cn.edu.sustc.recoder.Utils;
 
 import org.jtransforms.fft.DoubleFFT_1D;
-
 public class FFT {
     public static Complex[] fft(double[] real) {
         DoubleFFT_1D df1 = new DoubleFFT_1D(real.length);

@@ -143,7 +143,8 @@ public class XcorrTest {
         } catch (Exception e) {
             e.getCause().printStackTrace();
         }
-        System.out.println(s.count);
+        assertEquals(s.count,0);
     }
+
 }
 

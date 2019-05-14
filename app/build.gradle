@@ -36,10 +36,10 @@ dependencies {
     implementation group: 'com.github.wendykierp', name: 'JTransforms', version: '3.1'
     // https://mvnrepository.com/artifact/us.hebi.matlab/mat-parent
     implementation group: 'us.hebi.matlab', name: 'mat-parent', version: '0.4.1', ext: 'pom'
-
     testImplementation'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'mbanje.kurt:fabbutton:1.2.4@aar'
+    implementation 'com.ramotion.foldingcell:folding-cell:1.2.3'
 
 }

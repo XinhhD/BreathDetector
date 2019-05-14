@@ -2,6 +2,7 @@ package cn.edu.sustc.recoder.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class TrackPeak {
@@ -20,25 +21,25 @@ public class TrackPeak {
 
    static class Result{
 
-    double[] max;
-    double[] min;
+    ArrayList<Double> max;
+    ArrayList<Double> min;
 
-    Result(double[] max, double[] min){
+    Result(ArrayList<Double> max, ArrayList<Double> min){
       this.max = max;
       this.min = min;
     }
 
-    public double[] getMax() {
+    public ArrayList<Double> getMax() {
       return max;
     }
 
-    public double[] getMin() {
+    public ArrayList<Double> getMin() {
       return min;
     }
 
   }
   // //参数：数组，数组大小
-  public static Result findPeaks(double[] num, int minDistance) {
+  public static Result findPeaks(double[] num, double minDistance) {
     List<Integer> sign = new ArrayList<Integer>();
     for (int i = 1; i < num.length; i++) {
       /* 相邻值做差： *小于0，，赋-1 *大于0，赋1 *等于0，赋0 */
@@ -53,8 +54,8 @@ public class TrackPeak {
     }
     // 再对sign相邻位做差
     // 保存极大值和极小值的位置
-    List<Integer> indMax = new ArrayList<Integer>();
-    List<Integer> indMin = new ArrayList<Integer>();
+    List<Integer> indMax = new LinkedList<>();
+    List<Integer> indMin = new LinkedList<>();
     for (int j = 1; j < sign.size(); j++) {
       int diff = sign.get(j) - sign.get(j - 1);
       if (diff < 0) {
@@ -64,17 +65,31 @@ public class TrackPeak {
       }
     }
 
-
-    double[] max = new double[indMax.size()];
-    for (int m = 0; m < indMax.size(); m++) {
-      max[m] = num[indMax.get(m)];
+    ArrayList<Double> max = new ArrayList<>();
+    ArrayList<Double> min = new ArrayList<>();
+    int minIndex = 0;
+    if(indMax.size()>indMin.size()){
+      minIndex = indMin.size();
+    }else{
+      minIndex = indMax.size();
+    }
+    for (int m = 0; m < minIndex; m++) {
+      int maxInd = ((LinkedList<Integer>) indMax).pop();
+      int minInd = ((LinkedList<Integer>) indMin).pop();
+      if (num[maxInd] - num[minInd] >= minDistance){
+        max.add(num[maxInd]);
+        min.add(num[minInd]);
+      }
+    }
+    while(indMax.size()!=0){
+      max.add(num[((LinkedList<Integer>) indMax).pop()]);
     }
 
-    double[] min = new double[indMin.size()];
-    for (int n = 0; n < indMin.size(); n++) {
-      min[n] = num[indMin.get(n)];
+    while(indMin.size()!=0){
+      min.add(num[((LinkedList<Integer>) indMin).pop()]);
     }
-
+    System.out.println("max"+max.size());
+    System.out.println("min"+min.size());
     return new Result(max, min);
 
   }

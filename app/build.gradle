@@ -41,5 +41,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'mbanje.kurt:fabbutton:1.2.4@aar'
     implementation 'com.ramotion.foldingcell:folding-cell:1.2.3'
+    implementation 'org.knowm.xchart:xchart:3.5.4'
 
 }

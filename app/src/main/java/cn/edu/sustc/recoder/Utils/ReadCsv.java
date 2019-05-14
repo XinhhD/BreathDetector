@@ -27,6 +27,8 @@ public class ReadCsv {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+//    System.out.println(result[2][3]);
     return result;
 
   }

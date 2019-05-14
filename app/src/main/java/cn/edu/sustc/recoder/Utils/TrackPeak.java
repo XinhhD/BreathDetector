@@ -18,12 +18,31 @@ public class TrackPeak {
 
   }
 
+   static class Result{
+
+    double[] max;
+    double[] min;
+
+    Result(double[] max, double[] min){
+      this.max = max;
+      this.min = min;
+    }
+
+    public double[] getMax() {
+      return max;
+    }
+
+    public double[] getMin() {
+      return min;
+    }
+
+  }
   // //参数：数组，数组大小
-  public static void findPeaks(int[] num, int count) {
+  public static Result findPeaks(double[] num, int minDistance) {
     List<Integer> sign = new ArrayList<Integer>();
-    for (int i = 1; i < count; i++) {
+    for (int i = 1; i < num.length; i++) {
       /* 相邻值做差： *小于0，，赋-1 *大于0，赋1 *等于0，赋0 */
-      int diff = num[i] - num[i - 1];
+      double diff = num[i] - num[i - 1];
       if (diff > 0) {
         sign.add(1);
       } else if (diff < 0) {
@@ -44,15 +63,20 @@ public class TrackPeak {
         indMin.add(j);
       }
     }
-    System.out.println("极大值为:");
+
+
+    double[] max = new double[indMax.size()];
     for (int m = 0; m < indMax.size(); m++) {
-      System.out.print(num[indMax.get(m)] + " ");
+      max[m] = num[indMax.get(m)];
     }
-    System.out.println();
-    System.out.println("极小值为:");
+
+    double[] min = new double[indMin.size()];
     for (int n = 0; n < indMin.size(); n++) {
-      System.out.print(num[indMin.get(n)] + " ");
+      min[n] = num[indMin.get(n)];
     }
+
+    return new Result(max, min);
+
   }
 
 

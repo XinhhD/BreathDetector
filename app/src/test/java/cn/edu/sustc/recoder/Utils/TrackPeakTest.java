@@ -8,7 +8,7 @@ public class TrackPeakTest {
 
   @Test
   public void findPeaks() {
-    int a[] = { 1, 2, 10, 2, 4, 1, 8, 10, 23, 0 };
+    double a[] = { 1, 2, 10, 2, 4, 1, 8, 10, 23, 0 };
     TrackPeak.findPeaks(a, 10);
   }
 }

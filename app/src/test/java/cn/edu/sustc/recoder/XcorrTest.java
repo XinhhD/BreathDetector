@@ -13,11 +13,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import cn.edu.sustc.recoder.Utils.Complex;
 import cn.edu.sustc.recoder.Utils.FFT;
+import cn.edu.sustc.recoder.Utils.ReadCsv;
 import cn.edu.sustc.recoder.Utils.ReadMusicFile;
 import cn.edu.sustc.recoder.Utils.funcFFT;
 import cn.edu.sustc.recoder.Utils.loopQueue;
 import cn.edu.sustc.recoder.Utils.xcorr;
 
+import static cn.edu.sustc.recoder.Utils.xcorr.get_range;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -153,6 +155,14 @@ public class XcorrTest {
         for (double e: ans
              ) {
             System.out.println(e);
+        }
+    }
+    @Test
+    public void get_range_Test() {
+        double[][] input = ReadCsv.ReadCsvFile("D:\\studioProject\\Recoder\\app\\src\\test\\java\\cn\\edu\\sustc\\recoder\\matrix.csv");
+        int[]index = get_range(input);
+        for (int i = 0; i <index.length ; i++) {
+            System.out.println(index[i]);
         }
     }
 }

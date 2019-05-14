@@ -48,17 +48,7 @@ public class WavReader {
             long startTime = System.currentTimeMillis();
             double[] x = buffer.clone();
             double[] y = buffer.clone();
-            for (int j = 0; j <200; j++) {
-                double[] X = complex2real(fft(x));
-                double[] Y = complex2real(fft(y));
-                double[] H = new double[X.length];
-                for (int i = 0; i < X.length; i++) {
-                    if (X[i] == 0.0)
-                        X[i] = 0.0001;
-                    H[i] = Y[i]/X[i];
-                }
-                double[] h_raw = complex2real(ifft(Complex.parseDouble(H)));
-            }
+            double[][] cir = xcorr.CIR(x, y);
 
             long endTime = System.currentTimeMillis();
             System.out.println("程序运行时间：" + (endTime - startTime) + "ms");

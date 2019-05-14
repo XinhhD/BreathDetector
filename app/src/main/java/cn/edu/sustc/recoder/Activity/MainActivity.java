@@ -333,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
         private int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
         private File outFile;
         public boolean isRecording;
-        private ArrayList<Byte> dataArray = new ArrayList<>();
+        ArrayList<Byte> dataArray = new ArrayList<>();
 
         public MyRecoder() {
             createAudioRecord();

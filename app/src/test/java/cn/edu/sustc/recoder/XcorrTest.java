@@ -146,5 +146,14 @@ public class XcorrTest {
         assertEquals(s.count,0);
     }
 
+    @Test
+    public void auto_corr_Test() {
+        double[] input = {1, 2, 3, 4, 5, 6, 6};
+        double[] ans = xcorr.autoCorr(input);
+        for (double e: ans
+             ) {
+            System.out.println(e);
+        }
+    }
 }
 

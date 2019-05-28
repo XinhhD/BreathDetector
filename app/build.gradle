@@ -42,5 +42,6 @@ dependencies {
     implementation 'mbanje.kurt:fabbutton:1.2.4@aar'
     implementation 'com.ramotion.foldingcell:folding-cell:1.2.3'
     implementation 'org.knowm.xchart:xchart:3.5.4'
+    implementation files('D:/AS/jre/jre/lib/rt.jar')
 
 }

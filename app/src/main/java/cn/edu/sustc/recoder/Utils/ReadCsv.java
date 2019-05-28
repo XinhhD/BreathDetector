@@ -16,11 +16,11 @@ public class ReadCsv {
                 String item[] = line.split(",");//CSV格式文件为逗号分隔符文件，这里根据逗号切分
                 store.add(item);
             }
-            result = new double[store.get(0).length][store.size()];
+            result = new double[store.size()][store.get(0).length];
             for (int i = 0; i < store.size(); i++) {
                 String[] temp = store.get(i);
                 for (int j = 0; j < temp.length; j++) {
-                    result[j][i] = Double.valueOf(temp[j]);
+                    result[i][j] = Double.valueOf(temp[j]);
                 }
             }
 

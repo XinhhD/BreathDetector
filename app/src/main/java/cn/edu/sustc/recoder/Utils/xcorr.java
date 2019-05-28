@@ -48,9 +48,21 @@ public class xcorr {
         int index = 0;
         for (double[]row: CIR_matrix
              ) {
-            autocorr_score[index++] = get_score(autoCorr(row));
+            row = zscore(row);
+            double[]f = autoCorr(row);
+            autocorr_score[index++] = get_score(f);
         }
         return get_good_range(autocorr_score);
+    }
+
+    private static double[] zscore(double[] row) {
+        double[] res = new double[row.length];
+        double avg = Stastic.getAverage(row);
+        double stdv = Stastic.getStandardDiviation(row);
+        for (int i = 0; i < row.length; i++) {
+            res[i] = (row[i] - avg) / stdv;
+        }
+        return res;
     }
 
 
@@ -62,7 +74,7 @@ public class xcorr {
     public static double[] autoCorr(double[]x){
         double[] ans = new double[x.length];
         for (int i = 0; i < x.length; i++) {
-            int sum = 0;
+            double sum = 0;
             for (int j = i ; j < x.length; j++) {
                 sum += x[j] * x[j - i];
             }

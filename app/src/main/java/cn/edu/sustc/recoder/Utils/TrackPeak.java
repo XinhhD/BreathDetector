@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static cn.edu.sustc.recoder.Utils.Filtfilt.doFiltfilt;
 import static java.lang.Math.abs;
 
 public class TrackPeak {
@@ -20,17 +21,18 @@ public class TrackPeak {
 
     }
 
-    static class Result{
+    public static class Result {
 
-        int[] max;
-        int[] min;
+        public int[] max;
+        public int[] min;
 
-        Result(int[] max, int[] min){
+        Result(int[] max, int[] min) {
             this.max = max;
             this.min = min;
         }
 
     }
+
     // //参数：数组，数组大小
     public static Result findPeaks(double[] num, int minDistance) {
         List<Integer> sign = new ArrayList<Integer>();
@@ -74,16 +76,18 @@ public class TrackPeak {
     }
 
     public static double get_score(double[] arr) {
+//        new Grawer(arr, "fig1", "arr").show();
         arr = IIRFilter(arr);
+//        new Grawer(arr, "fig1", "arr").show();
         Result res = findPeaks(arr, 0);
         int[] max = res.max;
         int[] min = res.min;
         if (max.length < 1 || min.length < 1) {
-            System.out.println("xx");
+
         } else {
             int ind1 = 0;
             int ind2 = 0;
-            int sum = 0;
+            double sum = 0;
             while (ind1 < max.length) {
                 if (max[ind1] <= min[ind2]) {
                     ind1++;
@@ -99,50 +103,36 @@ public class TrackPeak {
             }
             return sum;
         }
-        return -1;
+        return 0;
     }
 
     /**
      * just for 200*600
+     *
      * @param signal
      * @return
      */
     public static double[] IIRFilter(double[] signal) {
         double[] b = {0.0201, 0.0402, 0.0201};
         double[] a = {1, -1.5610, 0.6414};
-        double[] in = new double[b.length];
-        double[] out = new double[a.length-1];
-
-        double[] outData = new double[signal.length];
-
-        for (int i = 0; i < signal.length; i++) {
-
-            System.arraycopy(in, 0, in, 1, in.length - 1);
-            in[0] = signal[i];
-
-            //calculate y based on a and b coefficients
-            //and in and out.
-            double y = 0.0;
-            for(int j = 0 ; j < b.length ; j++){
-                y += b[j] * in[j];
-
-            }
-
-            for(int j = 0;j < a.length-1;j++){
-
-                y -= a[j + 1] * out[j];
-
-            }
-
-            //shift the out array
-            System.arraycopy(out, 0, out, 1, out.length - 1);
-            out[0] = y;
-
-            outData[i] = y;
-
-
+        ArrayList<Double> B = toAL(b);
+        ArrayList<Double> A = toAL(a);
+        ArrayList<Double> input = toAL(signal);
+        Object[] outData = doFiltfilt(B, A, input).toArray();
+        double[] out = new double[signal.length];
+        for (int i = 0; i <signal.length ; i++) {
+            out[i] = (double)outData[i];
         }
-        return outData;
+        return out;
     }
+
+    private static ArrayList<Double> toAL(double[] arr) {
+        ArrayList<Double> B = new ArrayList<Double>();
+        for (int i = 0; i < arr.length; i++) {
+            B.add(arr[i]);
+        }
+        return B;
+    }
+
 
 }

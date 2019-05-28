@@ -30,9 +30,10 @@ public class Grawer {
         // Create Chart
         chart = QuickChart.getChart(FigName, xName, yName, funcName, xData, yData);
     }
+
     public void show() {
         // Show it
-        new SwingWrapper(chart).displayChart();
+//        new SwingWrapper(chart).displayChart();
     }
 
     public static void main(String[] args) {

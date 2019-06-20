@@ -8,25 +8,33 @@
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
-        android:layout_width="421dp"
-        android:layout_height="352dp"
+        android:layout_width="346dp"
+        android:layout_height="274dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.069" />
 
     <Button
         android:id="@+id/choose"
         android:layout_width="110dp"
         android:layout_height="44dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="20dp"
         android:onClick="onChooseFile"
         android:text="Choose"
         app:layout_constraintBottom_toTopOf="@+id/start"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.484"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chart"
+        app:layout_constraintVertical_bias="0.72" />
 
 
     <Button
@@ -34,14 +42,29 @@
         android:layout_width="114dp"
         android:layout_height="46dp"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="136dp"
-        android:layout_marginBottom="120dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onRecord"
         android:text="START"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.895"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chart"
+        app:layout_constraintVertical_bias="0.403" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -68,18 +68,34 @@ public class FFT {
         return ret;
     }
     public static double[] xcorr(double[] recData, double[] rawData, boolean firstLargerThanSecond) {
-        int length1 = recData.length;
-        int length2 = rawData.length;
-        double[] rawExt = new double[length1];
-        for (int i = 0; i < length2; i++) {
-            rawExt[i] = rawData[i];
+        if (firstLargerThanSecond) {
+            int length1 = recData.length;
+            int length2 = rawData.length;
+            double[] rawExt = new double[length1];
+            for (int i = 0; i < length2; i++) {
+                rawExt[i] = rawData[i];
+            }
+            Complex[] recFFT = fft(recData);// 有偏移的数据，
+            Complex[] rawFFT = fft(rawExt); // 原始的无偏移的数据
+            Complex[] conjRawFFT = conj(rawFFT);
+            Complex[] temp = mul(conjRawFFT, recFFT);
+            Complex[] ret = ifft(temp);
+            return complex2real(ret);
+        } else {
+            int length1 = recData.length;
+            int length2 = rawData.length;
+            double[] rawExt = new double[length1];
+            for (int i = 0; i < length2; i++) {
+                rawExt[i] = rawData[i];
+            }
+            Complex[] recFFT = fft(recData);// 有偏移的数据，
+            Complex[] rawFFT = fft(rawExt); // 原始的无偏移的数据
+            Complex[] conjRawFFT = conj(rawFFT);
+            Complex[] temp = mul(conjRawFFT, recFFT);
+            Complex[] ret = ifft(temp);
+            return complex2real(ret);
         }
-        Complex[] recFFT = fft(recData);// 有偏移的数据，
-        Complex[] rawFFT = fft(rawExt); // 原始的无偏移的数据
-        Complex[] conjRawFFT = conj(rawFFT);
-        Complex[] temp = mul(conjRawFFT,recFFT);
-        Complex[] ret = ifft(temp);
-        return complex2real(ret);
+
     }
 
 }

@@ -5,6 +5,7 @@ import org.jtransforms.fft.DoubleFFT_1D;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -17,10 +18,12 @@ import cn.edu.sustc.recoder.Utils.Grawer;
 import cn.edu.sustc.recoder.Utils.ReadCsv;
 import cn.edu.sustc.recoder.Utils.ReadMusicFile;
 import cn.edu.sustc.recoder.Utils.TrackPeak;
+import cn.edu.sustc.recoder.Utils.Util;
 import cn.edu.sustc.recoder.Utils.funcFFT;
 import cn.edu.sustc.recoder.Utils.loopQueue;
 import cn.edu.sustc.recoder.Utils.xcorr;
 
+import static cn.edu.sustc.recoder.Utils.TrackPeak.distSeq;
 import static cn.edu.sustc.recoder.Utils.TrackPeak.findPeaks;
 import static cn.edu.sustc.recoder.Utils.xcorr.get_range;
 import static org.junit.Assert.assertArrayEquals;
@@ -98,58 +101,73 @@ public class XcorrTest {
         Complex[] as = Complex.parseDouble(s11);
         System.out.println();
     }
+//
+//    @Test
+//    public void listTest() {
+//        short st= 1;
+//        double db = (double)st;
+//        short[] s11 = {-1, 1, -1, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8};
+//        byte[] s22 = {1, 2, 3, 4, 5, 6, 7, 8};
+//        LinkedList s = new LinkedList();
+//        s.add(s11);
+//        LinkedList s1 = new LinkedList();
+//        s1.add(s22);
+//        xcorr.xcorr(s,s1);
+//
+//
+//    }
 
     @Test
-    public void listTest() {
-        short st= 1;
-        double db = (double)st;
-        short[] s11 = {-1, 1, -1, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8};
-        byte[] s22 = {1, 2, 3, 4, 5, 6, 7, 8};
-        LinkedList s = new LinkedList();
-        s.add(s11);
-        LinkedList s1 = new LinkedList();
-        s1.add(s22);
-        xcorr.xcorr(s,s1);
+    public void xcorrRealTest() {
+        long time = System.currentTimeMillis();
+        double[] s11 = ReadCsv.ReadCsv("D:\\studioProject\\Recoder\\app\\src\\test\\java\\cn\\edu\\sustc\\recoder\\rcv.csv");
+        double[] s22 = ReadCsv.ReadCsv("D:\\studioProject\\Recoder\\app\\src\\test\\java\\cn\\edu\\sustc\\recoder\\org.csv");
+        new Grawer(s11, "fig1", "rec").show();
+        new Grawer(s22, "fig2", "org").show();
+        double[] rel = FFT.xcorr(s11, s22, true);
+        int index = Util.max(rel).index;
+        System.out.println(index);
+        System.out.println(System.currentTimeMillis()-time);
     }
 
-    @Test
-    public void ListConcurrent() {
-        final loopQueue<Short> s = new loopQueue<Short>(200);
-        Lock curl = new ReentrantLock();
-        try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    int j =0;
-                    for (int i = 0; i <10000000 ; i++) {
-                        short sh = 2;
-                        try {
-                            s.add(sh);
-                        } catch (ArrayStoreException e) {
-
-                        }
-
-                    }
-                }
-            }).start();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    int j = 0;
-                    for (int i = 0; i <10000000 ; i++) {
-                        try {
-                            s.removeOne();
-                        } catch (IllegalAccessException e) {
-                            System.out.println("remove wrong:"+j++);
-                        }
-                    }
-                }
-            }).start();
-        } catch (Exception e) {
-            e.getCause().printStackTrace();
-        }
-        assertEquals(s.count,0);
-    }
+//    @Test
+//    public void ListConcurrent() {
+//        final loopQueue<Short> s = new loopQueue<Short>(200);
+//        Lock curl = new ReentrantLock();
+//        try {
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    int j =0;
+//                    for (int i = 0; i <10000000 ; i++) {
+//                        short sh = 2;
+//                        try {
+//                            s.add(sh);
+//                        } catch (ArrayStoreException e) {
+//
+//                        }
+//
+//                    }
+//                }
+//            }).start();
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    int j = 0;
+//                    for (int i = 0; i <10000000 ; i++) {
+//                        try {
+//                            s.removeOne();
+//                        } catch (IllegalAccessException e) {
+//                            System.out.println("remove wrong:"+j++);
+//                        }
+//                    }
+//                }
+//            }).start();
+//        } catch (Exception e) {
+//            e.getCause().printStackTrace();
+//        }
+//        assertEquals(s.count,0);
+//    }
 
     @Test
     public void auto_corr_Test() {
@@ -175,6 +193,27 @@ public class XcorrTest {
         for (int i = 0; i <index.length ; i++) {
             System.out.println(index[i]);
         }
+    }
+    @Test
+    public void whole_test() {
+        long start = System.currentTimeMillis();
+        long finished;
+        double[][] input = ReadCsv.ReadCsvFile("D:\\studioProject\\Recoder\\app\\src\\test\\java\\cn\\edu\\sustc\\recoder\\matrix.csv");
+        int[]index = get_range(input);
+        ArrayList<Integer> zrange = new ArrayList<>();
+        for (int i = 0; i < index.length; i++) {
+            if (index[i] != 0) {
+                zrange.add(index[i]);
+            }
+        }
+        int[] range = new int[zrange.size()];
+        for (int i = 0; i < range.length; i++) {
+            range[i] = zrange.get(i);
+        }
+        double count = distSeq(input,range);
+        System.out.println(count);
+        finished = System.currentTimeMillis();
+        System.out.println("Process time: " + (finished-start) + " ms");
     }
 //    @Test
 //    public void find_peak_Test() {

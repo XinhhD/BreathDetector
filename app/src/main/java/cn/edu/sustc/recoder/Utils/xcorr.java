@@ -20,8 +20,6 @@ public class xcorr {
         double[] rel = FFT.xcorr(ar1,ar2,true);
         int index = Util.max(rel).index;
         rec.subList(0,index).clear();
-        Log.d(TAG, "xcorr: ");
-        assert rec.size() == raw.size();
     }
 
     public static double[][] CIR(double[] x, double[] y) {

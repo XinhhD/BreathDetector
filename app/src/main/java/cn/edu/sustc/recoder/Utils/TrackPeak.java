@@ -87,9 +87,9 @@ public class TrackPeak {
     return best;
   }
 
-  public static void distSeq(double[][] M, int[] range){
-    long start = System.currentTimeMillis();
-    long finished;
+  public static double distSeq(double[][] M, int[] range){
+//    long start = System.currentTimeMillis();
+//    long finished;
 //    System.out.println(Arrays.toString(range));
     boolean first = true;
 //    System.out.println(M[0].length);
@@ -109,18 +109,18 @@ public class TrackPeak {
       Spline spline = new Spline(xData, portion, 5*range.length);
       double[] xInt = spline.getIntX();
       double[] yInt = spline.getIntY();
-      if (first) {
-        XYChart chart1 = QuickChart.getChart("Raw Data", "X", "Y", "y(x)", xData, portion);
-
-        XYChart chart2 = QuickChart.getChart("Spline Data", "X", "Y", "y(x)", xInt, yInt);
-
-        try {
-          BitmapEncoder.saveBitmapWithDPI(chart1, "./img/Before_Interpolation", BitmapEncoder.BitmapFormat.PNG, 300);
-          BitmapEncoder.saveBitmapWithDPI(chart2, "./img/After_Interpolation", BitmapEncoder.BitmapFormat.PNG, 300);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
+//      if (first) {
+//        XYChart chart1 = QuickChart.getChart("Raw Data", "X", "Y", "y(x)", xData, portion);
+//
+//        XYChart chart2 = QuickChart.getChart("Spline Data", "X", "Y", "y(x)", xInt, yInt);
+//
+//        try {
+//          BitmapEncoder.saveBitmapWithDPI(chart1, "./img/Before_Interpolation", BitmapEncoder.BitmapFormat.PNG, 300);
+//          BitmapEncoder.saveBitmapWithDPI(chart2, "./img/After_Interpolation", BitmapEncoder.BitmapFormat.PNG, 300);
+//        } catch (IOException e) {
+//          e.printStackTrace();
+//        }
+//      }
       List<Integer> pline_peaks = findPeaks(yInt,0.001).getMax();
       List<Double> peak_index = new ArrayList<Double>();
       for (Integer ii:pline_peaks) {
@@ -145,8 +145,8 @@ public class TrackPeak {
         }
       }
     }
-    finished = System.currentTimeMillis();
-    System.out.println("Process time: " + (finished-start) + " ms");
+//    finished = System.currentTimeMillis();
+//    System.out.println("Process time: " + (finished-start) + " ms");
     XYChart chart3;
 //    for (int i = 0; i < peaks.size(); i++) {
       List<Double> tempt_peak = getBestCurve();
@@ -161,31 +161,160 @@ public class TrackPeak {
       }
       double[] filt_y = IIRFilter(y);
 
-      chart3 = QuickChart.getChart("Peak best", "X", "Y", "y(x)", x, filt_y);
+//      chart3 = QuickChart.getChart("Peak best", "X", "Y", "y(x)", x, filt_y);
+//
+//      try {
+//        BitmapEncoder.saveBitmapWithDPI(chart3, "./img/peek_best", BitmapEncoder.BitmapFormat.PNG, 300);
+//      } catch (IOException e) {
+//        e.printStackTrace();
+//      }
+////    }
 
-      try {
-        BitmapEncoder.saveBitmapWithDPI(chart3, "./img/peek_best", BitmapEncoder.BitmapFormat.PNG, 300);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+//    double[] peak = new double[tempt_peak.size()];
+//    for (int i = 0; i < tempt_peak.size(); i++) {
+//      peak[i] = tempt_peak.get(i);
 //    }
+//    Complex[] result = FFT.fft(peak);
+//    double[] abs = new double[result.length];
+//    double max = 0.0;
+//    for (int i = 0; i < result.length; i++) {
+//      abs[i] = result[i].abs();
+//      if (abs[i] > max) {
+//        max = abs[i];
+//      }
+//    }
+    Result res = findPeaks(filt_y, 0);
+    /*
+    first case:  \/
+    second case: \/\
+    third case: /\
+    fourth case: /\/
+     */
+    if (abs(res.max.size() - res.min.size()) > 1) {
+      return -1;
+    }else{
+      int min = res.max.size()>res.min.size() ? res.min.size():res.max.size();
+      double count = min + 0.5*abs(res.max.size() - res.min.size());
+      return count;
+    }
 
-    double[] peak = new double[tempt_peak.size()];
-    for (int i = 0; i < tempt_peak.size(); i++) {
-      peak[i] = tempt_peak.get(i);
-    }
-    Complex[] result = FFT.fft(peak);
-    double[] abs = new double[result.length];
-    double max = 0.0;
-    for (int i = 0; i < result.length; i++) {
-      abs[i] = result[i].abs();
-      if (abs[i] > max) {
-        max = abs[i];
-      }
-    }
 
   }
+  public static double[][] distSeqPlot(double[][] M, int[] range){
+//    long start = System.currentTimeMillis();
+//    long finished;
+//    System.out.println(Arrays.toString(range));
+    boolean first = true;
+//    System.out.println(M[0].length);
+    for (int i = 0; i < M[0].length; i++) {
+      double[] portion = new double[range.length];
+      for (int j = 0; j < range.length; j++) {
+        portion[j] = M[range[j]][i];
+      }
+      double[] xData = new double[range.length];
+      for (int j = 0; j < range.length; j++) {
+        xData[j] = (double) range[j];
+      }
 
+//      System.out.println(Arrays.toString(portion));
+//      System.out.println(Arrays.toString(xData));
+
+      Spline spline = new Spline(xData, portion, 5*range.length);
+      double[] xInt = spline.getIntX();
+      double[] yInt = spline.getIntY();
+//      if (first) {
+//        XYChart chart1 = QuickChart.getChart("Raw Data", "X", "Y", "y(x)", xData, portion);
+//
+//        XYChart chart2 = QuickChart.getChart("Spline Data", "X", "Y", "y(x)", xInt, yInt);
+//
+//        try {
+//          BitmapEncoder.saveBitmapWithDPI(chart1, "./img/Before_Interpolation", BitmapEncoder.BitmapFormat.PNG, 300);
+//          BitmapEncoder.saveBitmapWithDPI(chart2, "./img/After_Interpolation", BitmapEncoder.BitmapFormat.PNG, 300);
+//        } catch (IOException e) {
+//          e.printStackTrace();
+//        }
+//      }
+      List<Integer> pline_peaks = findPeaks(yInt,0.001).getMax();
+      List<Double> peak_index = new ArrayList<Double>();
+      for (Integer ii:pline_peaks) {
+        peak_index.add(xInt[ii]);
+      }
+      if (first){
+        first = false;
+        for (Double p_i:peak_index){
+          List<Double> tempt = new ArrayList<>();
+          tempt.add(p_i);
+          peaks.add(tempt);
+        }
+      } else{
+        for (Double p_i:peak_index) {
+          for (List<Double> peak:peaks) {
+            double last_peak = peak.get(peak.size()-1);
+            if (Math.abs(last_peak-p_i)<3.0){
+              peak.add(p_i);
+              break;
+            }
+          }
+        }
+      }
+    }
+//    finished = System.currentTimeMillis();
+//    System.out.println("Process time: " + (finished-start) + " ms");
+    XYChart chart3;
+//    for (int i = 0; i < peaks.size(); i++) {
+    List<Double> tempt_peak = getBestCurve();
+//          (ArrayList) peaks.get(i);
+    double[] x = new double[tempt_peak.size()];
+    for (int j = 0; j < x.length; j++) {
+      x[j] = (double) j;
+    }
+    double[] y = new double[tempt_peak.size()];
+    for (int j = 0; j < y.length; j++) {
+      y[j] = tempt_peak.get(j);
+    }
+    double[] filt_y = IIRFilter(y);
+
+//      chart3 = QuickChart.getChart("Peak best", "X", "Y", "y(x)", x, filt_y);
+//
+//      try {
+//        BitmapEncoder.saveBitmapWithDPI(chart3, "./img/peek_best", BitmapEncoder.BitmapFormat.PNG, 300);
+//      } catch (IOException e) {
+//        e.printStackTrace();
+//      }
+////    }
+
+//    double[] peak = new double[tempt_peak.size()];
+//    for (int i = 0; i < tempt_peak.size(); i++) {
+//      peak[i] = tempt_peak.get(i);
+//    }
+//    Complex[] result = FFT.fft(peak);
+//    double[] abs = new double[result.length];
+//    double max = 0.0;
+//    for (int i = 0; i < result.length; i++) {
+//      abs[i] = result[i].abs();
+//      if (abs[i] > max) {
+//        max = abs[i];
+//      }
+//    }
+    Result res = findPeaks(filt_y, 0);
+    double count = 0;
+    /*
+    first case:  \/
+    second case: \/\
+    third case: /\
+    fourth case: /\/
+     */
+    if (abs(res.max.size() - res.min.size()) > 1) {
+
+    }else{
+      int min = res.max.size()>res.min.size() ? res.min.size():res.max.size();
+      count = min + 0.5*abs(res.max.size() - res.min.size());
+    }
+    double[][] arrs= {filt_y,{count}};
+    return arrs;
+
+
+  }
   static class Result{
 
     ArrayList<Integer> max;
@@ -273,8 +402,6 @@ public class TrackPeak {
     while(indMin.size()!=0){
       min.add(((LinkedList<Integer>) indMin).pop());
     }
-    System.out.println("max"+max.size());
-    System.out.println("min"+min.size());
     return new Result(max, min);
 
   }

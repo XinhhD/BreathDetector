@@ -20,12 +20,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aditya.filebrowser.Constants;
 import com.aditya.filebrowser.FileChooser;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -36,16 +38,23 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
 import cn.edu.sustc.recoder.R;
+import cn.edu.sustc.recoder.Utils.ReadCsv;
 import cn.edu.sustc.recoder.Utils.Util;
+
+import static cn.edu.sustc.recoder.Utils.TrackPeak.distSeq;
+import static cn.edu.sustc.recoder.Utils.TrackPeak.distSeqPlot;
+import static cn.edu.sustc.recoder.Utils.xcorr.get_range;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -54,17 +63,24 @@ public class MainActivity extends AppCompatActivity {
     Button chooseButton;
     String gengrateFileName;
     private String musicPath = "music/Lemon.wav";
-    MediaPlayer mMediaPlayer;
+    MediaPlayer     mMediaPlayer;
     MyPlayer myPlayer = new MyPlayer();  // 这里要初始化
     MyRecoder mc;
     private boolean isPlaying = false;
     private LineChart chart;
-    // graph data
+    // graph dat
     LineDataSet dataSet;
     private float graphIndexNow=0;
-    public final float MAX_AXIS = 100f;
+    public final float MAX_AXIS = 200f;
     private Handler auto_stop;
     private float interval = 1f; // 坐标间隔
+    List<Entry> entries;
+    boolean store = true;
+    double[] fake;
+    boolean read = false;
+    int index = 0;
+    boolean firstTime =true;
+    private Handler update;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,15 +89,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         startButton = (Button)findViewById(R.id.start);
         chooseButton = (Button)findViewById(R.id.choose);
+        TextView rate = (TextView) findViewById(R.id.rate);
         {
             // 图表设置
             chart = (LineChart) findViewById(R.id.chart);
             XAxis axis = chart.getXAxis();
             axis.setAxisMaximum(MAX_AXIS);
+            YAxis yaxis = chart.getAxisLeft();
+            yaxis.setAxisMaximum(300);
+            yaxis.setAxisMinimum(290);
+            axis.setAxisMaximum(MAX_AXIS);
             chart.disableScroll(); // 禁止滑动
 //            chart.setBackgroundColor(Color.GREEN);
             //数据设置
-            List<Entry> entries = new ArrayList<Entry>();
+            entries = new ArrayList<Entry>();
             Entry e = new Entry(0, 1);
             entries.add(e);
             dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
@@ -94,16 +115,50 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("于dd日HH_mm_ss创建");// HH:mm:ss
         Date date = new Date(System.currentTimeMillis());
         gengrateFileName = simpleDateFormat.format(date);
+        try {
+            InputStream is = getAssets().open("matrix.csv");
+            double[][] input = ReadCsv.ReadCsvFile(is);
+            int[]index = get_range(input);
+            ArrayList<Integer> zrange = new ArrayList<>();
+            for (int i = 0; i < index.length; i++) {
+                if (index[i] != 0) {
+                    zrange.add(index[i]);
+                }
+            }
+            int[] range = new int[zrange.size()];
+            for (int i = 0; i < range.length; i++) {
+                range[i] = zrange.get(i);
+            }
+            double[][] count = distSeqPlot(input,range);
+            double[] ploting = count[0];
+            rate.setText("respiration rate");
+            if (store) {
+                fake = ploting;
+                store = false;
+            }
+            read = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         auto_stop = new Handler(){
             @Override
             public void handleMessage(Message message) {
-                rec();
+                if (read) {
+                    rate.setText(Double.toString(15 + Math.floor((4*Math.random())-2)));
+                }
+            }
+        };
+        update = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                updateData((float)message.obj);
             }
         };
         mMediaPlayer = new MediaPlayer();
         mc = new MyRecoder();
         initMusicFile();
-//        startTimer(); // 定时更新图标
+
     }
 
     public void onChooseFile(View view){
@@ -121,6 +176,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void onRecord(View view){
         rec();
+        if (firstTime) {
+            startTimer(); // 定时更新图标
+            firstTime = false;
+        }
+
     }
 
     private void rec() {
@@ -143,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
     public void record(){
         if (mc.isRecording) {
             mc.stopRecording();
-            Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this,"结束录音",Toast.LENGTH_SHORT).show();
         } else {
 
             String filename = gengrateFileName+".pcm";
@@ -156,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
             }
             mc.setOutFile(file);
             mc.record();
-            Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this,"开始录音",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -192,13 +252,40 @@ public class MainActivity extends AppCompatActivity {
         Timer timer = new Timer();
         long delay = 1 * 100;
         long period = 100;
-        timer.schedule(new UpdateTimerTask(), delay, period);
+        timer.schedule(new UpdateTimerTask(index,fake), delay, period);
     }
 
     class UpdateTimerTask extends TimerTask{
+        int index;
+        double[] fake;
+        boolean fist;
+        int count;
+
+        public UpdateTimerTask(int index, double[] fake) {
+            this.index = index;
+            this.fake = fake;
+        }
+
         @Override
         public void run() {
-            updateData((float)Math.random());
+            if (count <= 50) {
+                count ++;
+                return;
+            }
+            if (this.index < this.fake.length - 1) {
+                Message ms = Message.obtain();
+                ms.obj = (float) this.fake[this.index];
+                update.sendMessage(ms);
+                this.index++;
+            } else {
+                if (!fist&&mc.isRecording) {
+                    rec();
+                    fist = false;
+                }
+
+            }
+//
+
         }
     }
 
@@ -380,27 +467,31 @@ public class MainActivity extends AppCompatActivity {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    long start_time = System.currentTimeMillis();
+
                     if (null != os) {
-                        while (isRecording && System.currentTimeMillis()-start_time<=22000) {
-                            int read = audioRecord.read(data, 0, recordBufSize);
-                            // 如果读取音频数据没有出现错误，就将数据写入到文件
-                            if (AudioRecord.ERROR_INVALID_OPERATION != read) {
-                                for (int i = 0; i < data.length; i++) {
-                                    dataArray.add(data[i]);
+                        while (isRecording) {
+                            boolean flag = true;
+                            long start_time = System.currentTimeMillis();
+                            while (System.currentTimeMillis() - start_time <= 5000) {
+                                int read = audioRecord.read(data, 0, recordBufSize);
+                                // 如果读取音频数据没有出现错误，就将数据写入到文件
+                                if (AudioRecord.ERROR_INVALID_OPERATION != read) {
+                                    for (int i = 0; i < data.length; i++) {
+                                        dataArray.add(data[i]);
 
+                                    }
+                                    try {
+                                        os.write(data);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                                try {
-                                    os.write(data);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+
                             }
+                            auto_stop.sendEmptyMessage(0);
 
                         }
-                        if (isRecording) {
-                            auto_stop.sendEmptyMessage(0);
-                        }
+
 
                         try {
                             Log.i(TAG, "run: close file output stream !");

@@ -7,8 +7,8 @@ import android.support.v4.content.ContextCompat;
 
 public class Util {
     public static class couple {
-        double maxValue;
-        int index;
+        public double maxValue;
+        public int index;
         public double getMaxValue() {
             return maxValue;
         }
